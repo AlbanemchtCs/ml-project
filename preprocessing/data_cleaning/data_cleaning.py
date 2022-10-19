@@ -62,7 +62,7 @@ class DataCleaning:
         # Replacing * with nan and dropping instances with NaN values in the column Price
         self.df = self.df.replace("*", np.nan)
         if self.target_column_name in self.df.columns:
-            self.df = self.df[self.columns_to_keep + self.target_column_name]
+            self.df = self.df[self.columns_to_keep + [self.target_column_name]]
             self.df = self.df.dropna(subset=[self.target_column_name])
         else:
             self.df = self.df[self.columns_to_keep]
@@ -80,8 +80,7 @@ class DataCleaning:
 
     def bool_to_numerical(self):
         for column in self.bool_columns:
-            self.df[column] = self.df[column].replace("t", 1)
-            self.df[column] = self.df[column].replace("f", 0)
+            self.df[column] = self.df[column].replace("t", 1).replace("f", 0)
 
     def date_to_numerical(self, column:str = "Host Since"):
         try:
@@ -111,6 +110,26 @@ class DataCleaning:
             columns=columns_to_scale
         )
 
+    def dropping_nan_values(self):
+        columns = [
+            'Host Since',
+            'Is Superhost',
+            'Latitude',
+            'Longitude',
+            'Is Exact Location',
+            'Property Type',
+            'Room Type',
+            'Accomodates',
+            'Bathrooms',
+            'Bedrooms',
+            'Beds',
+            'Guests Included',
+            'Min Nights',
+            'Instant Bookable',
+            'Business Travel Ready'
+        ]
+        self.df = self.df.dropna(subset=columns)
+
     def imputation(self, strategy:str):
         if strategy == "stochastic":
             columns = self.df.columns
@@ -119,10 +138,11 @@ class DataCleaning:
             self.df = pd.DataFrame(imputed_df, columns=columns)
     
     def save_csv(self, csv_name:str):
-        self.df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name))
+        self.df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name), index=False)
 
     def data_cleaning(self, imputation_strategy: str = "stochastic", csv_name: str = "train_airbnb_berlin_cleaned.csv") -> pd.DataFrame:
         self.df_creation()
+        self.dropping_nan_values()
         self.to_one_hot()
         self.bool_to_numerical()
         self.date_to_numerical()
@@ -132,7 +152,7 @@ class DataCleaning:
         self.standard_scaling()
         self.save_csv(csv_name=csv_name)
 
-# data_cleaner = DataCleaning(path="/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv")
-# data_cleaner.data_cleaning(csv_name="train_airbnb_berlin_cleaned.csv")
+data_cleaner = DataCleaning(path="/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv")
+data_cleaner.data_cleaning(csv_name="train_airbnb_berlin_cleaned.csv")
 data_cleaner = DataCleaning(path="/Users/cha/Desktop/3A/code/ml-project/data/test_airbnb_berlin.csv")
 data_cleaner.data_cleaning(csv_name="test_airbnb_berlin_cleaned.csv")
