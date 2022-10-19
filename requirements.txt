@@ -1,0 +1,10 @@
+numpy
+pandas
+sklearn
+xgboost
+tensorflow
+ipykernel
+black
+matplotlib
+pylint
+tqdm
