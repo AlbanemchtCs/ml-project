@@ -119,7 +119,7 @@ class DataCleaning:
             self.df = pd.DataFrame(imputed_df, columns=columns)
     
     def save_csv(self, csv_name:str):
-        self.df.to_csv(os.path.join("./data", csv_name))
+        self.df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name))
 
     def data_cleaning(self, imputation_strategy: str = "stochastic", csv_name: str = "train_airbnb_berlin_cleaned.csv") -> pd.DataFrame:
         self.df_creation()
