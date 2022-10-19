@@ -1,92 +1,94 @@
-# ml-project
+# **Airbnb Berlin Price Prediction**
 
+The project aims to predict the price of a night's accommodation offered on the short-term rental website Airbnb in the city of Berlin. This project is derived from a data challenge proposed by dphi.tech.
 
+<p align="center">
+  <img src="media/airbnb.png" alt="AirBnB" width="60%"/>
+</p>
 
-## Getting started
+## **Strategy**
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Current strategy will be **XGB** because of:
+- **Performance:**
+  - In my experience, in tabular competitions, XGB generally performed better than other models (e.g. RandomForest)
+- **Ease of use:**
+  - no need for feature scaling
+  - no need to deal with missing values
+  - no need to pay attention to multicollinearity
+  - plots feature importance
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+<p align="center">
+  <img src="media/xgboost.png" alt="XGB" width="60%"/>
+</p>
 
-## Add your files
+## **Baseline**
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+On a train-test split, using a constant model using the average training price:
+- **Average absolute test error of 30.50€**
+- **Percentage of predictions within 20€ of the true price: 39%** ( average price is 61€ )
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/charlotte_sasson/ml-project.git
-git branch -M main
-git push -uf origin main
-```
+## **Current Performance**
 
-## Integrate with your tools
+On a train-test split, using XGB with default parameters and the preprocessing pipeline described below:
+- **Average absolute test error of 20.60€**
+- **Percentage of predictions within 20€ of the true price: 70%**
 
-- [ ] [Set up project integrations](https://gitlab.com/charlotte_sasson/ml-project/-/settings/integrations)
+## **Performance Log**
 
-## Collaborate with your team
+| Date | Model | Test Error | Improvement | Comment |
+| --- | --- | --- | --- | --- |
+| 18-10-2022 | Baseline | 30.50€ | NA | Constant, average price of training set |
+| 18-10-2022 | XGB | 21.60€ | 29% | Default parameters, preprocessing pipeline, overfitting |
+| 19-10-2022 | XGB | 20.60€ | 4% | Hyperparameter Tuning |
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+## **Preprocessing Guidelines**
 
-## Test and Deploy
+Here is the current preprocessing strategy:
 
-Use the built-in continuous integration in GitLab.
+| Feature | Keep? | Description | Modification | Comment |
+|---|---|---|---|---|
+| Listing ID | :x: | Unique id of the listing |   |  Might be needed to associate data with prediction |
+| Listing Name | :x: | This is the name of the listing, this is anonymized in the dataset and you can feel free to drop this variable from the data |  |  |
+| Host ID | :x: | Unique ID of the listing host |  |  |
+| Host Name | :x: | Name of the host who manages/owns the listing |  |  |
+| Host Since | :heavy_check_mark: | Date since they have been hosting on Airbnb | convert to numeric - duration to now |  |
+| Host Response Time | :heavy_check_mark: | Avg time taken by the host to respond to any query they get | Convert to one hot | many NaN |
+| Host Response Rate | :heavy_check_mark: | Avg response rate to the queries that the host receives for their listing | Convert to numeric | many NaN |
+| Is Superhost | :heavy_check_mark: | This field says whether the host is superhost or not. Superhost implies the best-rated host badge given by Airbnb based on the overall listing experience | Convert to bool (currently is "f" or "t") |  |
+| neighbourhood | :heavy_check_mark: | Provides information about neighbourhood of the listing | Extract average price and maybe convert to one-hot |  |
+| Neighborhood Group | :heavy_check_mark: | Provides information about neighbourhood group of the listing | Extract average price and maybe convert to one-hot |  |
+| City | :x: |  |  | Everything is in Berlin |
+| Postal Code | :heavy_check_mark: |  | Extract average price and maybe convert to one-hot |  |
+| Country Code | :x: |  |  | Everything is in Germany |
+| Country | :x: |  | Everything is in Germany |  |
+| Latitude | :interrobang: |  |  | Could be useful but doubt |
+| Longitude | :interrobang: |  |  | Could be useful but doubt |
+| Is Exact Location | :interrobang: |  |  | Doesn't look like useful |
+| Property Type | :heavy_check_mark: |  | Convert to one hot |  |
+| Room Type | :heavy_check_mark: |  | Convert to one hot |  |
+| Accomodates | :heavy_check_mark: |  | Convert to numeric |  |
+| Bathrooms | :heavy_check_mark: |  | Convert to numeric |  |
+| Bedrooms | :heavy_check_mark: |  | Convert to numeric |  |
+| Beds | :heavy_check_mark: |  | Convert to numeric |  |
+| Square Feet | :x: |  |  | Too many NaN |
+| Guests Included | :heavy_check_mark: |  | Convert to numeric |  |
+| Min Nights | :heavy_check_mark: |  | Convert to numeric |  |
+| Reviews | :heavy_check_mark: |  | Convert to numeric |  |
+| First Review | :interrobang: |  |  |  |
+| Last Review | :interrobang: |  |  | Could be useful as recent reviews are generally more relevant |
+| Overall Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Accuracy Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Cleanliness Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Checkin Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Communication Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Location Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Value Rating | :heavy_check_mark: |  | Convert to numeric |  |
+| Instant Bookable | :heavy_check_mark: |  | Convert to bool (currently is "f" or "t") |  |
+| Business Travel Ready | :heavy_check_mark: |  | Convert to bool (currently is "f" or "t") |  |
+| **Price** | :white_check_mark: | **TARGET** | Convert to numeric |  |
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Current feature importance is as follows:
 
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+<p align="center">
+  <img src="media/feature_importance.png" alt="XGB" width="100%"/>
+</p>
