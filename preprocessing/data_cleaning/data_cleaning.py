@@ -215,9 +215,9 @@ class DataCleaning:
         self.train_test_splitting()
         self.scaling()
         if self.is_dataset:
-            self.save_csv(self.data_train, csv_name="X_train.csv")
-            self.save_csv(self.data_val, csv_name="X_val.csv")
-            self.save_csv(self.data_test, csv_name="X_test.csv")
+            self.save_csv(self.data_train, csv_name="data_train.csv")
+            self.save_csv(self.data_val, csv_name="data_val.csv")
+            self.save_csv(self.data_test, csv_name="data_test.csv")
         else:
             self.save_csv(self.df, csv_name="test_airbnb_berlin_cleaned.csv")
 
