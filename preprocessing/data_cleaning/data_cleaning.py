@@ -170,7 +170,7 @@ class DataCleaning:
         # Only one instance has a value of 16 in Accomodates column:
         # we delete to make the stratification possible.
         self.df['Accomodates'] = self.df['Accomodates'].replace(16, np.NAN)
-        self.df = self.df.dropna(subset='Accomodates')
+        self.df = self.df.dropna(subset=['Accomodates'])
         whole_data_train, self.data_test = train_test_split(
             self.df,
             test_size=0.2,
