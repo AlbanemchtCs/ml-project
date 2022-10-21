@@ -210,6 +210,8 @@ class DataCleaning:
         self.feature_radius()
         self.to_float()
         self.imputation(strategy=imputation_strategy)
+        if self.is_dataset:
+            self.save_csv(self.df, csv_name="train_airbnb_berlin_cleaned.csv")
         self.train_test_splitting()
         self.scaling()
         if self.is_dataset:
