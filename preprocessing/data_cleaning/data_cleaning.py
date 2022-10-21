@@ -191,6 +191,7 @@ class DataCleaning:
         column_names = list(self.data_train.columns)
         scaler = MinMaxScaler(feature_range=[0, 1])
         self.data_train = pd.DataFrame(scaler.fit_transform(self.data_train), columns=column_names)
+        self.data_val = pd.DataFrame(scaler.transform(self.data_val), columns=column_names)
         self.data_test = pd.DataFrame(scaler.transform(self.data_test), columns=column_names)
 
     def save_csv(self, df: pd.DataFrame, csv_name:str):
