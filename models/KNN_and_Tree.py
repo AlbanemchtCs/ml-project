@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Oct 21 21:35:39 2022
+
+@author: Admin
+"""
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+os.chdir('../')
+os.chdir('preprocessing/data_cleaning')
+from data_cleaning import DataCleaning
+from sklearn.model_selection import train_test_split
+from xgboost import XGBRegressor, plot_importance
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.neighbors import NearestNeighbors
+
+
+class SpecialKNN:
+    def __init__(self,n_neighbors = 5):
+        self.n_neighbors = n_neighbors
+        
+    def fit(self,X_knn,X_tree,y):
+        
+        
+        X_knn = np.array(X_knn)
+        self.X_tree = np.array(X_tree)
+        self.y = np.array(y)
+        self.model_knn = NearestNeighbors(n_neighbors=self.n_neighbors, algorithm='ball_tree').fit(X_knn)
+        
+        
+        distances, indices = self.model_knn.kneighbors(X_knn)
+        
+        new_X = np.empty((len(self.X_tree),self.n_neighbors,len(self.X_tree[0])))
+        new_y = np.empty((len(self.X_tree),self.n_neighbors))
+        nb_final = len(self.X_tree)*self.n_neighbors
+        for i in range(len(self.X_tree)):
+            new_X[i] = self.X_tree[i] - self.X_tree[indices[i]]
+            new_y[i] = (self.y[i] - self.y[indices[i]])
+        self.model = XGBRegressor().fit(new_X.reshape((nb_final,len(self.X_tree[0]))),new_y.reshape((nb_final)))
+        
+        
+    def predict(self,X_knn,X_tree):
+        X_knn = np.array(X_knn)
+        X_tree = np.array(X_tree)
+        distances, indices = self.model_knn.kneighbors(X_knn)
+        
+        new_X = np.empty((len(X_tree),self.n_neighbors,len(X_tree[0])))
+        nb_final = len(X_tree)*self.n_neighbors
+        
+        for i in range(len(X_tree)):
+            new_X[i] = X_tree[i] - self.X_tree[indices[i]]
+        y = self.model.predict(new_X.reshape((nb_final,len(X_tree[0]))))
+        y = y.reshape((len(X_tree),self.n_neighbors))
+        final_y  = np.zeros(len(y))
+        
+        for i in range(len(y)):
+            y[i] = y[i]+self.y[indices[i]]
+            final_y[i] = sum(y[i])/self.n_neighbors
+        return final_y
+    
+# model = SpecialKNN()
+
+# data_cleaner = DataCleaning(path="C:/Users/Admin/Documents/ML project/ml-project/data/train_airbnb_berlin.csv")
+# data_cleaner.data_cleaning(csv_name="train_airbnb_berlin_cleaned.csv")
+# df = data_cleaner.df
+
+# train,test = train_test_split(df,random_state=0)
+# F = ['Beds','Bathrooms','Bedrooms','Accomodates','Guests Included','Room Type_Entire home/apt']
+# B = ['Longitude','Latitude']
+
+# model.fit(train[B],train[F],train['Price'])
+
+# y = model.predict(test[B],test[F])
+
+# error = y - test['Price']
