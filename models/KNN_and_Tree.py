@@ -27,7 +27,7 @@ class SpecialKNN:
         X_knn = np.array(X_knn)
         self.X_tree = np.array(X_tree)
         self.y = np.array(y)
-        self.model_knn = NearestNeighbors(n_neighbors=self.n_neighbors, algorithm='ball_tree').fit(X_knn)
+        self.model_knn = NearestNeighbors(n_neighbors=self.n_neighbors, algorithm='brute').fit(X_knn)
         
         
         distances, indices = self.model_knn.kneighbors(X_knn)
@@ -57,10 +57,11 @@ class SpecialKNN:
         
         for i in range(len(y)):
             y[i] = y[i]+self.y[indices[i]]
-            final_y[i] = sum(y[i])/self.n_neighbors
+            pond = 1/(np.sum(abs(new_X[i]),axis=1)+1)
+            final_y[i] = sum(pond*y[i])/sum(pond)
         return final_y
     
-# model = SpecialKNN()
+# model = SpecialKNN(50)
 
 # data_cleaner = DataCleaning(path="C:/Users/Admin/Documents/ML project/ml-project/data/train_airbnb_berlin.csv")
 # data_cleaner.data_cleaning(csv_name="train_airbnb_berlin_cleaned.csv")
@@ -74,4 +75,8 @@ class SpecialKNN:
 
 # y = model.predict(test[B],test[F])
 
-# error = y - test['Price']
+# er= y - test['Price']
+# error = abs(er)
+# print(np.mean(error))
+# print(np.mean(error/test['Price'])*100)
+# plt.hist(er,bins=40)
