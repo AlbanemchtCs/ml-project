@@ -159,6 +159,7 @@ class DataCleaning:
                 )
 
             # Values are between 0 and 100 for this variable
+            self.df['Overall Rating'] = self.df['Overall Rating'].astype(int)
             self.df['Overall Rating'] = self.df['Overall Rating'].apply(
                 lambda x: x if x <= 100 else 100
             )
