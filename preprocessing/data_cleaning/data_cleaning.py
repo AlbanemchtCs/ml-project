@@ -10,7 +10,9 @@ from sklearn.impute import IterativeImputer
 class DataCleaning:
     columns_to_keep = [
         'Host Since',
+        'Host Response Time',
         'Is Superhost',
+        'Neighborhood Group',
         'Latitude',
         'Longitude',
         'Is Exact Location',
@@ -41,7 +43,7 @@ class DataCleaning:
         "Min Nights"
     ]
     bool_columns = ["Is Superhost", "Instant Bookable", "Is Exact Location"]
-    OH_columns = ["Property Type", "Room Type"]
+    OH_columns = ["Property Type", "Room Type", "Neighborhood Group"]
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -97,6 +99,10 @@ class DataCleaning:
         df = df.dt.days.astype(np.float64)
         self.df[column] = df
 
+    def host_response_time(self):
+        is_nan = self.df['Host Response Time'].isna()
+        self.df['Host Response Time'] = is_nan.replace(False, 0).replace(True, 1)
+
     def feature_radius(self):
         """ Adding a feature: the radius from the most dense part of Berlin
             in terms of the quantity of airbnb flats in the area. """
@@ -105,7 +111,7 @@ class DataCleaning:
         self.df['dist_to_center'] = np.sqrt(
             (self.df['Longitude']-mean_longitude)**2 +(self.df['Latitude']-mean_latitude)**2
         )
-        self.df = self.df.drop(columns=['Latitude', 'Longitude'], axis=1)
+        # self.df = self.df.drop(columns=['Latitude', 'Longitude'], axis=1)
 
     def dropping_nan_values(self):
         """ Dropping NaN values for the concerned columns. """
@@ -164,6 +170,9 @@ class DataCleaning:
                 lambda x: x if x <= 100 else 100
             )
 
+    def delete_price_outliers(self, max_price: float):
+        self.df = self.df[self.df["Price"] < max_price]
+
     def train_test_splitting(self):
         """ Column to stratify: Accomodates. It is the feature with the
             highest Pearson coefficient regardint its correlation with Price.
@@ -189,11 +198,12 @@ class DataCleaning:
         """ Scaling the data. Method chosen is Min Max because most of the
         features are not Gaussian and we have a lot of feature OH encoded
         which have as values 0 or 1. """
-        column_names = list(self.data_train.columns)
+        columns = list(self.data_train.columns)
+        columns.remove('Price')
         scaler = MinMaxScaler(feature_range=[0, 1])
-        self.data_train = pd.DataFrame(scaler.fit_transform(self.data_train), columns=column_names)
-        self.data_val = pd.DataFrame(scaler.transform(self.data_val), columns=column_names)
-        self.data_test = pd.DataFrame(scaler.transform(self.data_test), columns=column_names)
+        self.data_train[columns] = pd.DataFrame(scaler.fit_transform(self.data_train[columns]), columns=columns)
+        self.data_val[columns] = pd.DataFrame(scaler.transform(self.data_val[columns]), columns=columns)
+        self.data_test[columns] = pd.DataFrame(scaler.transform(self.data_test[columns]), columns=columns)
 
     def save_csv(self, df: pd.DataFrame, csv_name:str):
         """ Saves the cleaned dataframe in a csv file in the same folder as the
@@ -202,18 +212,20 @@ class DataCleaning:
                 - csv_name : name of the csv file created """
         df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name), index=False)
 
-    def data_cleaning(self, imputation_strategy: str = "stochastic") -> pd.DataFrame:
+    def data_cleaning(self, imputation_strategy: str = "stochastic", max_price: float = 1000.0) -> pd.DataFrame:
         """ Main method: applies all the preprocesses. """
         self.df_creation()
         self.dropping_nan_values()
         self.to_one_hot()
         self.bool_to_numerical()
         self.date_to_numerical()
+        self.host_response_time()
         self.feature_radius()
         self.to_float()
         self.imputation(strategy=imputation_strategy)
         if self.is_dataset:
             self.save_csv(self.df, csv_name="train_airbnb_berlin_cleaned.csv")
+        self.delete_price_outliers(max_price=max_price)
         self.train_test_splitting()
         self.scaling()
         if self.is_dataset:
