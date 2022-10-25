@@ -34,7 +34,8 @@ class DataCleaning:
             'Location Rating',
             'Value Rating',
             'Instant Bookable',
-            'Business Travel Ready'
+            'Business Travel Ready',
+            'Host Response Time'
         ]
         self.target_column_name = 'Price'
         self.numerical_columns = [
@@ -61,12 +62,13 @@ class DataCleaning:
         self.df = pd.read_csv(self.path)
         # Replacing * with nan and dropping instances with NaN values in the column Price
         self.df = self.df.replace("*", np.nan)
+        self.df['Host Response Time'] = self.df['Host Response Time'].isna()
         if self.target_column_name in self.df.columns:
             self.df = self.df[self.columns_to_keep + [self.target_column_name]]
             self.df = self.df.dropna(subset=[self.target_column_name])
         else:
             self.df = self.df[self.columns_to_keep]
-
+            
     def to_one_hot(self):
         for column in self.categorical_columns:
             one_hot = pd.get_dummies(self.df[column], prefix=column)

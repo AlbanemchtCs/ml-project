@@ -22,6 +22,7 @@ from sklearn.linear_model import LinearRegression
 class SpecialKNN:
     def __init__(self,n_neighbors = 5):
         self.n_neighbors = n_neighbors
+        self.model = XGBRegressor()
         
     def fit(self,X_knn,X_tree,y):
         
@@ -40,7 +41,7 @@ class SpecialKNN:
         for i in range(len(self.X_tree)):
             new_X[i] = np.concatenate((self.X_tree[i] - self.X_tree[indices[i]],self.y[indices[i]].reshape((self.n_neighbors,1))),axis=1)
             new_y[i] = self.y[i]# - self.y[indices[i]])/self.y[indices[i]]
-        self.model = XGBRegressor().fit(new_X.reshape((nb_final,len(self.X_tree[0])+1)),new_y.reshape((nb_final)))
+        self.model.fit(new_X.reshape((nb_final,len(self.X_tree[0])+1)),new_y.reshape((nb_final)))
         self.feature_importances_ = self.model.feature_importances_
     def predict(self,X_knn,X_tree):
         X_knn = np.array(X_knn)
