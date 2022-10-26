@@ -177,23 +177,16 @@ class DataCleaning:
             self.df = self.df[self.df["Price"] < max_price]
 
     def train_test_splitting(self):
-        """ Column to stratify: Accomodates. It is the feature with the
-            highest Pearson coefficient regardint its correlation with Price.
-            """
         # Only one instance has a value of 16 in Accomodates column:
         # we delete to make the stratification possible.
-        self.df['Accomodates'] = self.df['Accomodates'].replace(16, np.NAN)
-        self.df = self.df.dropna(subset=['Accomodates'])
         whole_data_train, self.data_test = train_test_split(
             self.df,
             test_size=0.2,
-            stratify=self.df['Accomodates'],
             random_state=42, shuffle=True
         )
         self.data_train, self.data_val = train_test_split(
             whole_data_train,
             test_size=0.2,
-            stratify=whole_data_train['Accomodates'],
             random_state=42, shuffle=True
         )
 
