@@ -56,7 +56,7 @@ class DataCleaning:
         self.data_val = None
         self.encoded_columns = []
 
-    def df_creation(self):
+    def df_creation(self) -> None:
         """ Loading the DataFrame.
             Replacing '*' with NaN values.
             Dropping NaN value regarding the target column. """
@@ -71,7 +71,7 @@ class DataCleaning:
             self.is_dataset = False
             self.df = self.df[DataCleaning.columns_to_keep]
 
-    def to_one_hot(self):
+    def to_one_hot(self) -> None:
         """ Applies OH encoding on the concerned columns. """
         for column in DataCleaning.OH_columns:
             one_hot = pd.get_dummies(self.df[column], prefix=column)
@@ -79,17 +79,17 @@ class DataCleaning:
             self.df = self.df.drop(column, axis=1)
             self.df = self.df.join(one_hot)
 
-    def to_float(self):
+    def to_float(self) -> None:
         """ Converts to float the concerned columns. """
         for column in DataCleaning.numerical_columns:
             self.df[column] = self.df[column].astype(np.float64)
 
-    def bool_to_numerical(self):
+    def bool_to_numerical(self) -> None:
         """ Converts to numerical values the ordinal categorical columns. """
         for column in self.bool_columns:
             self.df[column] = self.df[column].replace("t", 1).replace("f", 0)
 
-    def date_to_numerical(self, column:str = "Host Since"):
+    def date_to_numerical(self, column:str = "Host Since") -> None:
         """ Dates become the difference in terms of days with the most
             recent one. """
         try:
@@ -101,11 +101,11 @@ class DataCleaning:
         df = df.dt.days.astype(np.float64)
         self.df[column] = df
 
-    def host_response_time(self):
+    def host_response_time(self) -> None:
         is_nan = self.df['Host Response Time'].isna()
         self.df['Host Response Time'] = is_nan.replace(False, 0).replace(True, 1)
 
-    def feature_radius(self):
+    def feature_radius(self) -> None:
         """ Adding a feature: the radius from the most dense part of Berlin
             in terms of the quantity of airbnb flats in the area. """
         mean_latitude = sum(self.df['Latitude'])/len(self.df['Latitude'])
@@ -115,7 +115,7 @@ class DataCleaning:
         )
         # self.df = self.df.drop(columns=['Latitude', 'Longitude'], axis=1)
 
-    def dropping_nan_values(self):
+    def dropping_nan_values(self) -> None:
         """ Dropping NaN values for the concerned columns. """
         columns = [
             'Host Since',
@@ -135,7 +135,7 @@ class DataCleaning:
         ]
         self.df = self.df.dropna(subset=columns)
 
-    def imputation(self, strategy: str = "stochastic"):
+    def imputation(self, strategy: str = "stochastic") -> None:
         """ Imputation for the concerned columns.
             The Imputation concerns the following columns:
             ['Overall Rating',
@@ -172,32 +172,25 @@ class DataCleaning:
                 lambda x: x if x <= 100 else 100
             )
 
-    def delete_price_outliers(self, max_price: float):
+    def delete_price_outliers(self, max_price: float) -> None:
         if self.is_dataset:
             self.df = self.df[self.df["Price"] < max_price]
 
-    def train_test_splitting(self):
-        """ Column to stratify: Accomodates. It is the feature with the
-            highest Pearson coefficient regardint its correlation with Price.
-            """
+    def train_test_splitting(self) -> None:
         # Only one instance has a value of 16 in Accomodates column:
         # we delete to make the stratification possible.
-        self.df['Accomodates'] = self.df['Accomodates'].replace(16, np.NAN)
-        self.df = self.df.dropna(subset=['Accomodates'])
         whole_data_train, self.data_test = train_test_split(
             self.df,
             test_size=0.2,
-            stratify=self.df['Accomodates'],
             random_state=42, shuffle=True
         )
         self.data_train, self.data_val = train_test_split(
             whole_data_train,
             test_size=0.2,
-            stratify=whole_data_train['Accomodates'],
             random_state=42, shuffle=True
         )
 
-    def scaling(self):
+    def scaling(self) -> None:
         """ Scaling the data. Method chosen is Min Max because most of the
         features are not Gaussian and we have a lot of feature OH encoded
         which have as values 0 or 1. """
@@ -226,14 +219,14 @@ class DataCleaning:
         else:
             self.df = pd.DataFrame(scaler.transform(self.df), columns=self.df.columns)
 
-    def save_csv(self, df: pd.DataFrame, csv_name:str):
+    def save_csv(self, df: pd.DataFrame, csv_name:str) -> None:
         """ Saves the cleaned dataframe in a csv file in the same folder as the
             one containing the not-cleaned dataframe.
             Attribute:
                 - csv_name : name of the csv file created """
         df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name), index=False)
 
-    def data_cleaning(self, imputation_strategy: str = "stochastic", max_price: float = 1000.0) -> pd.DataFrame:
+    def data_cleaning(self, imputation_strategy: str = "stochastic", max_price: float = 1000.0) -> None:
         """ Main method: applies all the preprocesses. """
         # Loading the dataframe from the given path
         self.df_creation()
