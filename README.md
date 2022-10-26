@@ -43,7 +43,7 @@ We looked at the Pearson’s Coefficients of all features separately regarding t
 ### **Dimensionality Reduction**
 
 | Fowards Selection |  | 
-|---|---|---|---|
+|---|---|
 | Bedrooms | 54.616082 | 
 | Room Type_Entire home/apt | 25.079846 | 
 | Bathrooms | 83.915373 | 
