@@ -54,7 +54,9 @@ We looked at the Pearson’s Coefficients of all features separately regarding t
 | Property Type_Hotel | 90.443688 |
 | Property Type_Serviced apartment | 43.127653 | 
 | Host Response Time | -6.122382 | 
-| Neighborhood Group_Charlottenburg-Wilm. | 13.186426 | <img src="media/variance_pca.png" alt="Variance PCA" width="400"/>
+| Neighborhood Group_Charlottenburg-Wilm. | 13.186426 | 
+
+<img src="media/variance_pca.png" alt="Variance PCA" width="400"/>
 
 * We have studied Best/Forward/Backward selection & PCA for dimensionality reduction. After studying the four methods, we decide to
 to use **Forward and Backward** stepwise selections and to reduce our dataset to **11 variables**
