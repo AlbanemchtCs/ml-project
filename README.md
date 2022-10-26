@@ -60,6 +60,7 @@ We looked at the Pearson’s Coefficients of all features separately regarding t
 to use **Forward and Backward** stepwise selections and to reduce our dataset to **11 variables**
 
 <img src="media/variance_pca.png" alt="Variance PCA" width="400"/>
+
 * PCA has allowed us to justify our dimensional reduction to a number of variables because these variables allow us to justify more than 80% of the variance
 
 ## **3. Models**
