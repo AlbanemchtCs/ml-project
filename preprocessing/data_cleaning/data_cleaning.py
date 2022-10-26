@@ -7,10 +7,14 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 
 
+scaler = MinMaxScaler(feature_range=[0, 1])
+
 class DataCleaning:
     columns_to_keep = [
         'Host Since',
+        'Host Response Time',
         'Is Superhost',
+        'Neighborhood Group',
         'Latitude',
         'Longitude',
         'Is Exact Location',
@@ -41,7 +45,7 @@ class DataCleaning:
         "Min Nights"
     ]
     bool_columns = ["Is Superhost", "Instant Bookable", "Is Exact Location"]
-    OH_columns = ["Property Type", "Room Type"]
+    OH_columns = ["Property Type", "Room Type", "Neighborhood Group"]
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -97,6 +101,10 @@ class DataCleaning:
         df = df.dt.days.astype(np.float64)
         self.df[column] = df
 
+    def host_response_time(self):
+        is_nan = self.df['Host Response Time'].isna()
+        self.df['Host Response Time'] = is_nan.replace(False, 0).replace(True, 1)
+
     def feature_radius(self):
         """ Adding a feature: the radius from the most dense part of Berlin
             in terms of the quantity of airbnb flats in the area. """
@@ -105,7 +113,7 @@ class DataCleaning:
         self.df['dist_to_center'] = np.sqrt(
             (self.df['Longitude']-mean_longitude)**2 +(self.df['Latitude']-mean_latitude)**2
         )
-        self.df = self.df.drop(columns=['Latitude', 'Longitude'], axis=1)
+        # self.df = self.df.drop(columns=['Latitude', 'Longitude'], axis=1)
 
     def dropping_nan_values(self):
         """ Dropping NaN values for the concerned columns. """
@@ -159,9 +167,14 @@ class DataCleaning:
                 )
 
             # Values are between 0 and 100 for this variable
+            self.df['Overall Rating'] = self.df['Overall Rating'].astype(int)
             self.df['Overall Rating'] = self.df['Overall Rating'].apply(
                 lambda x: x if x <= 100 else 100
             )
+
+    def delete_price_outliers(self, max_price: float):
+        if self.is_dataset:
+            self.df = self.df[self.df["Price"] < max_price]
 
     def train_test_splitting(self):
         """ Column to stratify: Accomodates. It is the feature with the
@@ -188,11 +201,30 @@ class DataCleaning:
         """ Scaling the data. Method chosen is Min Max because most of the
         features are not Gaussian and we have a lot of feature OH encoded
         which have as values 0 or 1. """
-        column_names = list(self.data_train.columns)
-        scaler = MinMaxScaler(feature_range=[0, 1])
-        self.data_train = pd.DataFrame(scaler.fit_transform(self.data_train), columns=column_names)
-        self.data_val = pd.DataFrame(scaler.transform(self.data_val), columns=column_names)
-        self.data_test = pd.DataFrame(scaler.transform(self.data_test), columns=column_names)
+        if self.is_dataset:
+            # Saving column "Price"
+            train_price_column = self.data_train["Price"]
+            # Reseting index of "Price"
+            train_price_column = train_price_column.reset_index(drop=True)
+            # Deleting column "Price"
+            self.data_train.drop(["Price"], axis=1, inplace=True)
+            # Scaling all the feature
+            self.data_train = pd.DataFrame(scaler.fit_transform(self.data_train), columns=self.data_train.columns)
+            # Replacing scaled "Price" with the former values
+            self.data_train["Price"] = train_price_column
+
+            val_price_column = self.data_val["Price"]
+            val_price_column = val_price_column.reset_index(drop=True)
+            self.data_val.drop(["Price"], axis=1, inplace=True)
+            self.data_val = pd.DataFrame(scaler.transform(self.data_val), columns=self.data_val.columns)
+            self.data_val["Price"] = val_price_column
+            test_price_column = self.data_test["Price"]
+            test_price_column = test_price_column.reset_index(drop=True)
+            self.data_test.drop(["Price"], axis=1, inplace=True)
+            self.data_test = pd.DataFrame(scaler.transform(self.data_test), columns=self.data_test.columns)
+            self.data_test["Price"] = test_price_column
+        else:
+            self.df = pd.DataFrame(scaler.transform(self.df), columns=self.df.columns)
 
     def save_csv(self, df: pd.DataFrame, csv_name:str):
         """ Saves the cleaned dataframe in a csv file in the same folder as the
@@ -201,25 +233,40 @@ class DataCleaning:
                 - csv_name : name of the csv file created """
         df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name), index=False)
 
-    def data_cleaning(self, imputation_strategy: str = "stochastic") -> pd.DataFrame:
+    def data_cleaning(self, imputation_strategy: str = "stochastic", max_price: float = 1000.0) -> pd.DataFrame:
         """ Main method: applies all the preprocesses. """
+        # Loading the dataframe from the given path
         self.df_creation()
+        # Dropping NaN values for some columns
         self.dropping_nan_values()
+        # OH for some columns
         self.to_one_hot()
+        # 0 / 1 encoding for some columns
         self.bool_to_numerical()
+        # Dealing with dates
         self.date_to_numerical()
+        # Dealing with Host Response Time column
+        self.host_response_time()
+        # Creating a new feature
         self.feature_radius()
+        # Conversion to float
         self.to_float()
+        # Imputing missing values for some columns
         self.imputation(strategy=imputation_strategy)
+        # Deleting "Price" outliers given a certain max price
+        self.delete_price_outliers(max_price=max_price)
         if self.is_dataset:
             self.save_csv(self.df, csv_name="train_airbnb_berlin_cleaned.csv")
-        self.train_test_splitting()
-        self.scaling()
-        if self.is_dataset:
+            # Splitting into Train - Val - Test
+            self.train_test_splitting()
+            # Scaling the features
+            self.scaling()
+            # Saving the dataframes in csv files
             self.save_csv(self.data_train, csv_name="data_train.csv")
             self.save_csv(self.data_val, csv_name="data_val.csv")
             self.save_csv(self.data_test, csv_name="data_test.csv")
         else:
+            self.scaling()
             self.save_csv(self.df, csv_name="test_airbnb_berlin_cleaned.csv")
 
 
