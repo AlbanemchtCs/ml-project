@@ -2,7 +2,7 @@
 
 The project aims to predict the price of a night's accommodation offered on the short-term rental website Airbnb in the city of Berlin. This project is derived from a data challenge proposed by dphi.tech.
 
-<img src="media/berlin.jpg" alt="Berlin" width="400"/>
+<center><img src="media/berlin.jpg" alt="Berlin" width="600"/><center>
 
 **Table of contents:**
 1. Folders organization
