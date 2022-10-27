@@ -30,6 +30,8 @@ The project aims to predict the price of a night's accommodation offered on the 
 
 - [utilities](https://gitlab.com/charlotte_sasson/ml-project/-/tree/main/utilities) ⇒ data and results analysis
 
+In order to do the preprocessing of your CSV files you need to go to the folder "data cleaning" in "preprocessing". Then, you need to replace the file paths to your CSVs at the end of data_cleaning.py and launch the file.
+
 ## **2. Data analysis & Preprocessing**
 
 <img src="media/correlation.png" alt="Pearson's correlation" width="600"/>
