@@ -30,7 +30,8 @@ The project aims to predict the price of a night's accommodation offered on the 
 
 - [utilities](https://gitlab.com/charlotte_sasson/ml-project/-/tree/main/utilities) ⇒ data and results analysis
 
-In order to do the preprocessing of your CSV files you need to go to the folder "data cleaning" in "preprocessing". Then, you need to replace the file paths to your CSVs at the end of data_cleaning.py and launch the file. \\
+In order to do the preprocessing of your CSV files you need to go to the folder "data cleaning" in "preprocessing". Then, you need to replace the file paths to your CSVs at the end of data_cleaning.py and launch the file. 
+
 Then, replace your three file paths that you obtained to your CSVs from data_cleaning.py (data_train_path, data_val_path and data_test_path) at the end of dimensionality_reduction.py and launch the file to obtain reduced CSVs of your three files.
 
 ## **2. Data analysis & Preprocessing**
