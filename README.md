@@ -44,19 +44,19 @@ We looked at the Pearson’s Coefficients of all features separately regarding t
 
 ### **Dimensionality Reduction**
 
-| Fowards Selection |  | 
+| Forward Selection with Cross-Validation approach | coef | 
 |---|---|
-| Bedrooms | 54.616082 | 
-| Room Type_Entire home/apt | 25.079846 | 
-| Bathrooms | 83.915373 | 
-| Accomodates | 74.884845 | 
-| dist_to_center | -43.948291 | 
-| Property Type_Loft | 27.289468 | 
-| Guests included | 42.534146 | 
-| Property Type_Hotel | 90.443688 |
-| Property Type_Serviced apartment | 43.127653 | 
-| Host Response Time | -6.122382 | 
-| Neighborhood Group_Charlottenburg-Wilm. | 13.186426 | 
+| Beds | 57.4275 | 
+| Room Type_Entire home/apt | 27.3036 | 
+| Bathrooms | 63.0385 | 
+| Guests included | 58.0408 | 
+| Property Type_Hotel | 85.3432 |
+| Property Type_Loft | 30.6319 | 
+| dist_to_center | -41.6857 | 
+| Bedrooms | 67.6714 | 
+| Neighborhood Group_Charlottenburg-Wilm. | 14.1214 | 
+| Is Superhost | 6.7162 | 
+| Neighborhood Group_Mitte | 5.7775 | 
 
 * We have studied Best/Forward/Backward selection & PCA for dimensionality reduction. After studying the four methods, we decide to
 to use **Forward and Backward** stepwise selections and to reduce our dataset to **11 variables**
