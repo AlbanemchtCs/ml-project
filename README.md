@@ -40,7 +40,7 @@ We looked at the Pearson’s Coefficients of all features separately regarding t
 
 ### **Preprocessing Strategy**
 
-<img src="media/preprocessing.png" alt="Preprocessing" width="1000"/>
+<img src="media/preprocessing.png" alt="Preprocessing update" width="1000"/>
 
 ### **Dimensionality Reduction**
 
