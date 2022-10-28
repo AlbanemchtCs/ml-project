@@ -9,6 +9,7 @@ from sklearn.impute import IterativeImputer
 
 scaler = MinMaxScaler(feature_range=[0, 1])
 
+
 class DataCleaning:
     columns_to_keep = [
         'Host Since',
@@ -89,7 +90,7 @@ class DataCleaning:
         for column in self.bool_columns:
             self.df[column] = self.df[column].replace("t", 1).replace("f", 0)
 
-    def date_to_numerical(self, column:str = "Host Since") -> None:
+    def date_to_numerical(self, column: str = "Host Since") -> None:
         """ Dates become the difference in terms of days with the most
             recent one. """
         try:
@@ -103,7 +104,8 @@ class DataCleaning:
 
     def host_response_time(self) -> None:
         is_nan = self.df['Host Response Time'].isna()
-        self.df['Host Response Time'] = is_nan.replace(False, 0).replace(True, 1)
+        self.df['Host Response Time'] = is_nan.replace(
+            False, 0).replace(True, 1)
 
     def feature_radius(self) -> None:
         """ Adding a feature: the radius from the most dense part of Berlin
@@ -111,7 +113,8 @@ class DataCleaning:
         mean_latitude = sum(self.df['Latitude'])/len(self.df['Latitude'])
         mean_longitude = sum(self.df['Longitude'])/len(self.df['Longitude'])
         self.df['dist_to_center'] = np.sqrt(
-            (self.df['Longitude']-mean_longitude)**2 +(self.df['Latitude']-mean_latitude)**2
+            (self.df['Longitude']-mean_longitude)**2 +
+            (self.df['Latitude']-mean_latitude)**2
         )
         # self.df = self.df.drop(columns=['Latitude', 'Longitude'], axis=1)
 
@@ -159,7 +162,8 @@ class DataCleaning:
             self.df = pd.DataFrame(imputed_df, columns=columns)
 
             # Cleaning obtained result to get only int values between 0 and 10
-            rating_columns = ['Accuracy Rating', 'Cleanliness Rating', 'Checkin Rating', 'Communication Rating', 'Location Rating', 'Value Rating']
+            rating_columns = ['Accuracy Rating', 'Cleanliness Rating', 'Checkin Rating',
+                              'Communication Rating', 'Location Rating', 'Value Rating']
             self.df[rating_columns] = self.df[rating_columns].astype(int)
             for column in rating_columns:
                 self.df[column] = self.df[column].apply(
@@ -202,29 +206,34 @@ class DataCleaning:
             # Deleting column "Price"
             self.data_train.drop(["Price"], axis=1, inplace=True)
             # Scaling all the feature
-            self.data_train = pd.DataFrame(scaler.fit_transform(self.data_train), columns=self.data_train.columns)
+            self.data_train = pd.DataFrame(scaler.fit_transform(
+                self.data_train), columns=self.data_train.columns)
             # Replacing scaled "Price" with the former values
             self.data_train["Price"] = train_price_column
 
             val_price_column = self.data_val["Price"]
             val_price_column = val_price_column.reset_index(drop=True)
             self.data_val.drop(["Price"], axis=1, inplace=True)
-            self.data_val = pd.DataFrame(scaler.transform(self.data_val), columns=self.data_val.columns)
+            self.data_val = pd.DataFrame(scaler.transform(
+                self.data_val), columns=self.data_val.columns)
             self.data_val["Price"] = val_price_column
             test_price_column = self.data_test["Price"]
             test_price_column = test_price_column.reset_index(drop=True)
             self.data_test.drop(["Price"], axis=1, inplace=True)
-            self.data_test = pd.DataFrame(scaler.transform(self.data_test), columns=self.data_test.columns)
+            self.data_test = pd.DataFrame(scaler.transform(
+                self.data_test), columns=self.data_test.columns)
             self.data_test["Price"] = test_price_column
         else:
-            self.df = pd.DataFrame(scaler.transform(self.df), columns=self.df.columns)
+            self.df = pd.DataFrame(scaler.transform(
+                self.df), columns=self.df.columns)
 
-    def save_csv(self, df: pd.DataFrame, csv_name:str) -> None:
+    def save_csv(self, df: pd.DataFrame, csv_name: str) -> None:
         """ Saves the cleaned dataframe in a csv file in the same folder as the
             one containing the not-cleaned dataframe.
             Attribute:
                 - csv_name : name of the csv file created """
-        df.to_csv(os.path.join(self.path.rsplit("/", 1)[0], csv_name), index=False)
+        df.to_csv(os.path.join(self.path.rsplit(
+            "/", 1)[0], csv_name), index=False)
 
     def data_cleaning(self, imputation_strategy: str = "stochastic", max_price: float = 1000.0) -> None:
         """ Main method: applies all the preprocesses. """
@@ -263,8 +272,8 @@ class DataCleaning:
             self.save_csv(self.df, csv_name="test_airbnb_berlin_cleaned.csv")
 
 
-# train_path = "/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv"
-# test_path = "/Users/cha/Desktop/3A/code/ml-project/data/test_airbnb_berlin.csv"
+train_path = "/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv"
+test_path = "/Users/cha/Desktop/3A/code/ml-project/data/test_airbnb_berlin.csv"
 
 data_cleaner = DataCleaning(path=train_path)
 data_cleaner.data_cleaning()
