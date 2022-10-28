@@ -266,7 +266,7 @@ class DataCleaning:
 # train_path = "/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv"
 # test_path = "/Users/cha/Desktop/3A/code/ml-project/data/test_airbnb_berlin.csv"
 
-# data_cleaner = DataCleaning(path=train_path)
-# data_cleaner.data_cleaning()
-# data_cleaner = DataCleaning(path=test_path)
-# data_cleaner.data_cleaning()
+data_cleaner = DataCleaning(path=train_path)
+data_cleaner.data_cleaning()
+data_cleaner = DataCleaning(path=test_path)
+data_cleaner.data_cleaning()

@@ -32,4 +32,4 @@ You should also start your commit message with one or two applicable emoji. This
 | :umbrella: `:umbrella:`                                   | When you improved coverage                         |
 | :twisted_rightwards_arrows: `:twisted_rightwards_arrows:` | When you merge a branch                            |
 
-This section was inspired by [this repository](https://github.com/schneegans/dynamic-badges-action).
+This section was inspired by [this repository](https://github.com/schneegans/dynamic-badges-action)
