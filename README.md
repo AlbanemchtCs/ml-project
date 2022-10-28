@@ -71,12 +71,12 @@ to use **Forward** stepwise selection with the cross-validation evaluation appro
 
 | Models | MSE | MAE | RAE | 
 |---|---|---|---|
-| Decision Tree | X | X |  X |  
-| Random Forest | X | X |  |  
-| Bagging | X | X |  |  
-| Gradient Boosting | X | X |  |  
-| AdaBoost | X | X | X |  
-| XGBoost | X | X | X | 
-| K-NN | X | X | X | 
-| K-NN & Tree | X | X |  
-| K-NN & XGBoost | X | X |  
+| Decision Tree | 1221.6 | 21.34€ |  69.6 % |  
+| Random Forest |  1145.89 | 20.63€ |  67.2 % |
+| Bagging |  1373.09 | 22.65€ |  73.8 % |
+| Gradient Boosting |  1116.14 | 20.25€ |  66.0 % |
+| AdaBoost |  1367.63 | 22.12€ |  72.1 % |
+| XGBoost |  1105.91 | 20.36€ |  66.4 % |
+| K-NN |  X | X€ |  X % |
+| K-NN & Tree |  X | X€ |  X % |
+| K-NN & XGBoost |  X | X€ |  X % |
