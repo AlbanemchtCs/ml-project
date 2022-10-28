@@ -77,6 +77,6 @@ to use **Forward** stepwise selection with the cross-validation evaluation appro
 | Gradient Boosting |  1116.14 | 20.25€ |  66.0 % |
 | AdaBoost |  1367.63 | 22.12€ |  72.1 % |
 | XGBoost |  1105.91 | 20.36€ |  66.4 % |
-| K-NN |  X | X€ |  X % |
-| K-NN & Tree |  X | X€ |  X % |
-| K-NN & XGBoost |  X | X€ |  X % |
+| K-NN |  1229.9 | 21.52€ |  70.1 % |
+| K-NN & Tree |  1122.3 | 20.79€ |  67.8 % |
+| K-NN & XGBoost |  1090.98 | 20.46€ |  66.7 % |
