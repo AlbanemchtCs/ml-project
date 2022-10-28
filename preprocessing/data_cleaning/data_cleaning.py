@@ -263,8 +263,8 @@ class DataCleaning:
             self.save_csv(self.df, csv_name="test_airbnb_berlin_cleaned.csv")
 
 
-train_path = "/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv"
-test_path = "/Users/cha/Desktop/3A/code/ml-project/data/test_airbnb_berlin.csv"
+# train_path = "/Users/cha/Desktop/3A/code/ml-project/data/train_airbnb_berlin.csv"
+# test_path = "/Users/cha/Desktop/3A/code/ml-project/data/test_airbnb_berlin.csv"
 
 data_cleaner = DataCleaning(path=train_path)
 data_cleaner.data_cleaning()
